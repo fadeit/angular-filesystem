@@ -29,7 +29,16 @@ fileSystem.factory('fileSystem', ['$q', '$timeout', function($q, $timeout) {
 
 	var requestFsFn = function(bytes) {
 		window.requestFileSystem(window.PERSISTENT, bytes, function(fs) {
-			safeResolve(fsDefer, fs);
+			if(window.cordova){
+				//defaulting to externalRootDirectory on cordova devices
+			    window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory, function (directoryEntry) {
+			        fs.root = directoryEntry;
+			        safeResolve(fsDefer, fs);
+			    });
+			}  
+			else{
+				safeResolve(fsDefer, fs);
+			}
 		}, function(e){
 			safeReject(fsDefer, {text: "Error requesting File System access", obj: e});
 		});
