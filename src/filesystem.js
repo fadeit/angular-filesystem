@@ -194,12 +194,13 @@ fileSystem.factory('fileSystem', ['$q', '$timeout', function($q, $timeout) {
 			
 			return fileSystem.writeBlob(fileName, blob, append);
 		},
-		writeArrayBuffer: function(fileName, buf, mimeString, append) {
+		writeArrayBuffer: function(filePath, fileName, buf, mimeString, append) {
+            var fullPath = filePath + fileName;
 			append = (typeof append == 'undefined' ? false : append);
 			
 			var blob = new Blob([new Uint8Array(buf)], {type: mimeString});
 			
-			return fileSystem.writeBlob(fileName, blob, append);
+			return fileSystem.writeBlob(fullPath, blob, append);
 		},
 		writeBlob: function(fileName, blob, append) {
 			append = (typeof append == 'undefined' ? false : append);
