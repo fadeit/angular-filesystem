@@ -263,11 +263,12 @@ fileSystem.factory('fileSystem', ['$q', '$timeout', function($q, $timeout) {
 			
 			return def.promise;
 		},
-		getFileEntry: function(fileName) {
+		getFileEntry: function(filePath, fileName) {
+            var fullPath = filePath + fileName;
 			var def = $q.defer();
 
 			fsDefer.promise.then(function(fs) {
-				fs.root.getFile(fileName, {}, function(fileEntry) {
+				fs.root.getFile(fullPath, {}, function(fileEntry) {
 					safeResolve(def, fileEntry);
 				}, function(e) {
 					safeReject(def, {text: "Error getting file", obj: e, fileName: fileName});
