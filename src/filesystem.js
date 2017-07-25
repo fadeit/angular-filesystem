@@ -174,7 +174,7 @@ fileSystem.factory('fileSystem', ['$q', '$timeout', function($q, $timeout) {
 				var buf = e.target.result;
 				
 				$timeout(function() {
-					fileSystem.writeArrayBuffer(filename, buf, mimeString).then(function() {
+					fileSystem.writeArrayBuffer("", filename, buf, mimeString).then(function() {
 						safeResolve(def, "");
 					}, function(e) {
 						safeReject(def, e);
