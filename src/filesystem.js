@@ -2,6 +2,7 @@ var fileSystem = angular.module('fileSystem',[]);
 
 fileSystem.factory('fileSystem', ['$q', '$timeout', function($q, $timeout) {
 	var fsDefer = $q.defer();
+    var fsReference = null;
 	
 	var DEFAULT_QUOTA_MB = 0;
 
@@ -29,16 +30,8 @@ fileSystem.factory('fileSystem', ['$q', '$timeout', function($q, $timeout) {
 
 	var requestFsFn = function(bytes) {
 		window.requestFileSystem(window.PERSISTENT, bytes, function(fs) {
-			if(window.cordova){
-				//defaulting to externalRootDirectory on cordova devices
-			    window.resolveLocalFileSystemURL(cordova.file.externalRootDirectory, function (directoryEntry) {
-			        fs.root = directoryEntry;
-			        safeResolve(fsDefer, fs);
-			    });
-			}  
-			else{
-				safeResolve(fsDefer, fs);
-			}
+            fsReference = fs;
+			safeResolve(fsDefer, fs);
 		}, function(e){
 			safeReject(fsDefer, {text: "Error requesting File System access", obj: e});
 		});
@@ -58,6 +51,14 @@ fileSystem.factory('fileSystem', ['$q', '$timeout', function($q, $timeout) {
 		isSupported: function() {
 			return angular.isDefined(window.webkitStorageInfo);
 		},
+        setFsRoot: function(rootDir){
+            fsDefer = $q.defer();
+		    window.resolveLocalFileSystemURL(rootDir, function (directoryEntry) {
+			  fsReference.root = directoryEntry;
+			  safeResolve(fsDefer, fsReference);
+			});
+            return fsDefer.promise;
+        },
 		getCurrentUsage: function() {
 			var def = $q.defer();
 			
