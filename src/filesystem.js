@@ -75,15 +75,20 @@ fileSystem.factory('fileSystem', ['$q', '$timeout', function($q, $timeout) {
 			return def.promise;
 		},
 		requestQuota: function(newQuotaMB) {
-			var def = $q.defer();
-			
-			navigator.webkitPersistentStorage.requestQuota(newQuotaMB*1024*1024, function(grantedBytes) {
-				safeResolve(def, grantedBytes);
-			}, function(e) {
-				safeReject(def, {text: "Error requesting quota increase", obj: e});
-			});
-			
-			return def.promise;
+      var def = $q.defer();  
+      fsDefer.promise.then(
+        function(){
+          console.log("FsDefer promise executed in requestQuota")                                                                                                                                             
+          navigator.webkitPersistentStorage.requestQuota(newQuotaMB*1024*1024, function(grantedBytes) {
+            safeResolve(def, grantedBytes);
+          }, function(e) {
+            safeReject(def, {text: "Error requesting quota increase", obj: e});
+          });
+        },
+        function(e) {
+          safeReject(def, {text: "Error resolving gsDefer promise", obj: e});
+        });
+      return def.promise;
 		},
 		getFolderContents: function(path) {
 			//remove leading slash if present
