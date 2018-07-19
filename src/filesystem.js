@@ -2,7 +2,7 @@ var fileSystem = angular.module('fileSystem',[]);
 
 fileSystem.factory('fileSystem', ['$q', '$timeout', function($q, $timeout) {
 	var fsDefer = $q.defer();
-    var fsReference = null;
+  var fsReference = null;
 	
 	var DEFAULT_QUOTA_MB = 0;
 
@@ -29,8 +29,10 @@ fileSystem.factory('fileSystem', ['$q', '$timeout', function($q, $timeout) {
 	}
 
 	var requestFsFn = function(bytes) {
+    console.log("RequestFsFn called")
 		window.requestFileSystem(window.PERSISTENT, bytes, function(fs) {
-            fsReference = fs;
+      fsReference = fs;
+      console.log("fsReference set!");
 			safeResolve(fsDefer, fs);
 		}, function(e){
 			safeReject(fsDefer, {text: "Error requesting File System access", obj: e});
@@ -51,14 +53,16 @@ fileSystem.factory('fileSystem', ['$q', '$timeout', function($q, $timeout) {
 		isSupported: function() {
 			return angular.isDefined(window.webkitStorageInfo);
 		},
-        setFsRoot: function(rootDir){
-            fsDefer = $q.defer();
-		    window.resolveLocalFileSystemURL(rootDir, function (directoryEntry) {
-			  fsReference.root = directoryEntry;
-			  safeResolve(fsDefer, fsReference);
+    setFsRoot: function(rootDir){
+      fsDefer = $q.defer();
+		  window.resolveLocalFileSystemURL(rootDir, function (directoryEntry) {
+        console.log("setFsRoot, setting root on fsReference")
+		    fsReference.root = directoryEntry;
+        console.log("fsReference.root has been set!")
+		    safeResolve(fsDefer, fsReference);
 			});
-            return fsDefer.promise;
-        },
+      return fsDefer.promise;
+    },
 		getCurrentUsage: function() {
 			var def = $q.defer();
 			
